@@ -1,11 +1,25 @@
 $(document).ready(function() {
 
+    const rowTemp = '<div class="row"></row>' 
+    const timeKeyTemp = '<div class="col-2 col-sm-1 locked rpmx"></div>'
+    const timeKeyPara = '<p class="timeKey"></p>'
+    const saveButton = '<div class="col-2 col-sm-1 btn btn-primary unlocked rpmx" hidden="true"></div>'
+    const entryField = '<textarea class="col-10 col-sm-11 unlocked entry rpmx" rows="3" disabled></textarea>'
+
+
+const schedEntries = { entries: [{}]}
+
+
     const dt = luxon.DateTime;
     let position = 0;
     let scheduleStart = $("#schedule");
     let displayClock = init();
 
     let rowArray = $(".row");
+    let entryArray = $(".entry");
+    let buttonArray = $(".btn");
+    let timeArray = $(".timeKey");
+    
     
     let timeHour = dt.local().set({hour: dt.local().hour, minute: "0", second: "0"});
 
@@ -14,6 +28,11 @@ $(document).ready(function() {
     }
 
     console.log(rowArray);
+
+    $(entryArray).on('click', function() {
+        let _this = this;
+        console.log(_this);
+    });
 
     $("#schedule").on('wheel', function(e) {
         // clearInterval(displayClock);
@@ -24,7 +43,7 @@ $(document).ready(function() {
         }// going down
         else {
             scrollUp();
-        }; // going up
+        };// going up
 
         return false;
       });
@@ -36,7 +55,7 @@ $(document).ready(function() {
         let rowCount = Math.floor((screenHeight - 166.7)/80)
 
         for(let i = 1; i < rowCount; i++) {
-            $(scheduleStart).append(rowTemplate);
+            appendRow();
         }
 
         dtDisplay.text(dtInit);
@@ -51,11 +70,11 @@ $(document).ready(function() {
 
     function formatRow(i, j) {
 
-        $(rowArray[i]).text(timeHour.plus({hours: i + j}).toLocaleString(dt.DATE_SHORT) +"\n" + timeHour.plus({hours: i + j}).toLocaleString(dt.TIME_SIMPLE));
+        $(timeArray[i]).text(timeHour.plus({hours: i + j}).toLocaleString(dt.DATE_SHORT) +"\n" + timeHour.plus({hours: i + j}).toLocaleString(dt.TIME_SIMPLE));
 
-        if (timeHour.hour + i + j === dt.local().hour) $(rowArray[i]).addClass("present");
-        else if (timeHour.hour + i + j > dt.local().hour) $(rowArray[i]).addClass("future");
-        else $(rowArray[i]).addClass("past");
+        if (timeHour.hour + i + j === dt.local().hour) $(timeArray[i]).addClass("present");
+        else if (timeHour.hour + i + j > dt.local().hour) $(timeArray[i]).addClass("future");
+        else $(timeAr[i]).addClass("past");
     }
 
     function scrollDown() {
@@ -69,9 +88,17 @@ $(document).ready(function() {
     function scrollUp() {
         position++; 
         $(rowArray[0]).remove();
-        $(scheduleStart).append(rowTemplate);
+        $(scheduleStart).append(rowTemp);
         rowArray = $(".row");
         formatRow(rowArray.length - 1, position);
+    }
+
+    function appendRow() {
+        let rowGen = $(scheduleStart).append(rowTemp);
+        console.log(rowGen);
+        rowGen.append(timeKeyTemp).append(timeKeyPara);
+        rowGen.append(saveButton);
+        rowGen.append(entryField);
     }
 
 });
