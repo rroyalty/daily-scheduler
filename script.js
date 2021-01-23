@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
     const dt = luxon.DateTime;
-    let curBlock = 0;
+    let position = 0;
     let scheduleStart = $("#schedule");
     let displayClock = init();
 
@@ -59,19 +59,19 @@ $(document).ready(function() {
     }
 
     function scrollDown() {
-        curBlock--; 
+        position--; 
         $(rowArray[rowArray.length - 1]).remove();
         $(scheduleStart).prepend(rowTemplate);
         rowArray = $(".row");
-        formatRow(0, curBlock);
+        formatRow(0, position);
     }
 
     function scrollUp() {
-        curBlock++; 
+        position++; 
         $(rowArray[0]).remove();
         $(scheduleStart).append(rowTemplate);
         rowArray = $(".row");
-        formatRow(rowArray.length - 1, curBlock);
+        formatRow(rowArray.length - 1, position);
     }
 
 });
