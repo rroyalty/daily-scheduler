@@ -4,6 +4,8 @@ $(document).ready(function() {
     let scheduleStart = $("#schedule");
     let displayClock = init();
 
+    let playerArray = [].slice.call ($(".playerList"));
+
     $("#schedule").on('wheel', function(e) {
 
         clearInterval(displayClock);
@@ -21,12 +23,7 @@ $(document).ready(function() {
         let screenHeight = screen.availHeight;
         let rowCount = Math.floor((screenHeight - 166.7)/80)
 
-        console.log(rowCount);
-        console.log(scheduleStart);
-        console.log(rowTemplate);
-
-
-        for(i = 0; i < rowCount; i++) {
+        for(let i = 2; i < rowCount; i++) {
             $(scheduleStart).append(rowTemplate);
         }
 
