@@ -23,7 +23,7 @@ $(document).ready(function() {
         let screenHeight = screen.availHeight;
         let rowCount = Math.floor((screenHeight - 166.7)/80)
 
-        for(let i = 2; i < rowCount; i++) {
+        for(let i = 1; i < rowCount; i++) {
             $(scheduleStart).append(rowTemplate);
         }
 
