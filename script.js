@@ -1,6 +1,7 @@
 $(document).ready(function() {
 
     const dt = luxon.DateTime;
+    let curBlock = 0;
     let scheduleStart = $("#schedule");
     let displayClock = init();
 
@@ -15,20 +16,14 @@ $(document).ready(function() {
     console.log(rowArray);
 
     $("#schedule").on('wheel', function(e) {
-        clearInterval(displayClock);
+        // clearInterval(displayClock);
         var delta = e.originalEvent.deltaY;
       
         if (delta < 0) {
-            $(rowArray[rowArray.length - 1]).remove();
-            $(scheduleStart).prepend(rowTemplate);
-            rowArray = $(".row");
-            formatRow(0);
+            scrollDown();
         }// going down
         else {
-            $(rowArray[0]).remove();
-            $(scheduleStart).append(rowTemplate);
-            rowArray = $(".row");
-            formatRow(rowArray.length - 1);
+            scrollUp();
         }; // going up
 
         return false;
@@ -55,11 +50,28 @@ $(document).ready(function() {
     }
 
     function formatRow(i, j) {
-        $(rowArray[i]).text(dt.local().toLocaleString(dt.DATE_SHORT) +"\n" + timeHour.plus({hours: i}).toLocaleString(dt.TIME_SIMPLE));
 
-        if (timeHour.hour + i === dt.local().hour) $(rowArray[i]).addClass("present");
-        else if (timeHour.hour + i > dt.local().hour) $(rowArray[i]).addClass("future");
+        $(rowArray[i]).text(timeHour.plus({hours: i + j}).toLocaleString(dt.DATE_SHORT) +"\n" + timeHour.plus({hours: i + j}).toLocaleString(dt.TIME_SIMPLE));
+
+        if (timeHour.hour + i + j === dt.local().hour) $(rowArray[i]).addClass("present");
+        else if (timeHour.hour + i + j > dt.local().hour) $(rowArray[i]).addClass("future");
         else $(rowArray[i]).addClass("past");
+    }
+
+    function scrollDown() {
+        curBlock--; 
+        $(rowArray[rowArray.length - 1]).remove();
+        $(scheduleStart).prepend(rowTemplate);
+        rowArray = $(".row");
+        formatRow(0, curBlock);
+    }
+
+    function scrollUp() {
+        curBlock++; 
+        $(rowArray[0]).remove();
+        $(scheduleStart).append(rowTemplate);
+        rowArray = $(".row");
+        formatRow(rowArray.length - 1, curBlock);
     }
 
 });
