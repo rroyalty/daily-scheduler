@@ -63,7 +63,7 @@ $(document).ready(function() {
         return false;
       });
 
-    $(document).on('swipe', function(event) {
+    $("#schedule").on('swipe', function(event) {
         alert("test!")
         console.log(event);
     });
