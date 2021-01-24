@@ -64,7 +64,16 @@ $(document).ready(function() {
       });
 
     $("#schedule").on('swipe', function(event) {
-        alert("test!")
+
+        let ydiff = event.swipestart.coords[1] - event.swipestop.coords[1];
+        if (ydiff < 0) {
+            scrollUp();
+        } else {
+            scrollDown();; 
+            }
+
+
+        alert("test!");
         console.log(event);
     });
 
