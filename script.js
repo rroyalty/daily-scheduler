@@ -105,18 +105,18 @@ $(document).ready(function() {
     }
 
     function rowChildren(rowsToAppend) {
-        let timeKeyTemp = '<div class="col-2 col-sm-1 locked rpmx"></div>'
-        let saveButton = '<div class="col-2 col-sm-1 btn btn-primary unlocked rpmx" hidden="true">Save Entry</div>'
-        let entryField = '<textarea class="col-10 col-sm-11 entry rpmx" rows="3" disabled></textarea>'
-        let timeKeyPara = '<p class="timeKey"></p>'
+        let timeKeyTemp = '<div class="d-inline-flex col-2 col-sm-1 locked rpmx"></div>'
+        let saveButton = '<div class="d-inline-flex d-none col-2 col-sm-1 btn btn-primary align-items-center justify-content-center unlocked rpmx">Save Entry</div>'
+        let entryField = '<textarea class="d-inline-flex col-10 col-sm-11 entry rpmx" rows="3" disabled></textarea>'
+        let timeKeyPara = '<p class="d-inline-flex timeKey text-center align-items-center m-0"></p>'
         $(timeKeyTemp).appendTo(rowsToAppend).append(timeKeyPara);
         $(saveButton).appendTo(rowsToAppend);
         $(entryField).appendTo(rowsToAppend);
     };
 
     function lockAllEntries() {
-        $(".locked").prop("hidden", false);
-        $(".unlocked").prop("hidden", true);
+        $(".locked").removeClass("d-none");
+        $(".unlocked").addClass("d-none");
         $(".entry").prop("disabled", true);
     }
 
@@ -129,26 +129,27 @@ $(document).ready(function() {
             let timeKey = $(_this).children(".locked").eq(0);
             let textArea = $(_this).children(".entry").eq(0);
 
-            if (!lockToggle && $(event.target).hasClass('entry')) {
-                lockToggle = true;
+            if ($(_this).hasClass('past') || $(_this).hasClass('present')) {
+                return false;
 
-                lockAllEntries();
-    
-                $(textArea).prop("disabled", false);
-                $(saveButton).prop("hidden", false);
-                $(timeKey).prop("hidden", true);
-                textArea.focus();
-    
-                } else if (lockToggle && $(event.target).hasClass('unlocked')) {
-
-                    if ($(textArea).val() !== "") {
-                        localStorage.setItem(rowID, JSON.stringify($(textArea).val()));
-                    }
+            } else if (!lockToggle && $(event.target).hasClass('entry')) {
+                    lockToggle = true;
 
                     lockAllEntries();
-                    lockToggle = false;
-    
-                  } else { return false };
+
+                    $(_this).removeClass("future");
+                    $(textArea).prop("disabled", false);
+                    $(saveButton).removeClass("d-none");
+                    $(timeKey).addClass("d-none");
+                    textArea.focus();
+        
+                    } else if (lockToggle && $(event.target).hasClass('unlocked')) {
+                        $(_this).addClass("future");
+                        localStorage.setItem(rowID, JSON.stringify($(textArea).val()));
+                        lockAllEntries();
+                        lockToggle = false;
+        
+                    } else { return false };
         });
         
     }

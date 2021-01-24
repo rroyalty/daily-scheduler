@@ -46,6 +46,7 @@ div.row {
 /* Row Part Max Height */
 .rpmx {
   max-height: 80px;
+  height: 80px;
 }
 
 .past {
