@@ -47,6 +47,7 @@ $(document).ready(function() {
         }
 
     });
+    
 
     $("#schedule").on('wheel', function(e) {
         // clearInterval(displayClock);
@@ -61,6 +62,14 @@ $(document).ready(function() {
 
         return false;
       });
+
+    $(document).on('swipeup', function() {
+        scrollUp();
+    });
+
+    $(document).on('swipedown', function() {
+        scrolldown();
+    });
 
     function init() {
         let dtInit = dt.local().weekdayLong + ", " + dt.local().toLocaleString(dt.DATETIME_MED_WITH_SECONDS);
