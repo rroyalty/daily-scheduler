@@ -186,6 +186,8 @@ $(document).ready(function() {
 
     // Sets event handlers for rows as they are created.
     function setEventHandler(rows) {
+
+        // On click text box, allow user to edit text and disable navigation until row is locked again. Only future rows may be editted.
         $(rows).on('click', function(event) {
             let _this = this;
             let saveButton = $(_this).children(".unlocked").eq(0);
@@ -194,9 +196,11 @@ $(document).ready(function() {
             console.log(storageID);
             let textArea = $(_this).children(".entry").eq(0);
 
+            // Only future rows may be editted.
             if ($(_this).hasClass('past') || $(_this).hasClass('present')) {
                 return false;
 
+            // Enable textbox and disable navigation.
             } else if (!lockToggle && $(event.target).hasClass('entry')) {
                     lockToggle = true;
 
@@ -208,6 +212,7 @@ $(document).ready(function() {
                     $(timeKey).addClass("d-none");
                     textArea.focus();
         
+                    // Lock the current row to editting and commit the changes to storage.
                     } else if (lockToggle && $(event.target).hasClass('unlocked')) {
                         $(_this).addClass("future");
                         localStorage.setItem(storageID, JSON.stringify($(textArea).val()));
