@@ -63,12 +63,9 @@ $(document).ready(function() {
         return false;
       });
 
-    $(document).on('swipeup', function() {
-        scrollUp();
-    });
-
-    $(document).on('swipedown', function() {
-        scrolldown();
+    $(document).on('swipe', function(event) {
+        alert("test!")
+        console.log(event);
     });
 
     function init() {
