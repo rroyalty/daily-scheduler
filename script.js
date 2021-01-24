@@ -11,6 +11,7 @@ $(document).ready(function() {
     let rowArray = init();
     let entryArray = $(".entry");
     let timeArray = $(".timeKey");
+    let buttonArray = $(".unlocked");
         
     let timeHour = dt.local().set({hour: dt.local().hour, minute: "0", second: "0"});
 
@@ -18,49 +19,7 @@ $(document).ready(function() {
         formatRow(i, 0);
     }
 
-    console.log(rowArray);
-
-    $(rowArray).on('click', function() {
-
-        if (lockToggle === true) return false;
-        
-        lockToggle = true;
-        let _this = this;
-
-        let rowID = $(_this).attr("id");
-
-        lockAllEntries();
-
-        let saveButton = $(_this).children(".unlocked").eq(0);
-        let timeKey = $(_this).children(".locked").eq(0);
-        let textArea = $(_this).children(".entry").eq(0);
-        $(textArea).prop("disabled", false);
-        $(saveButton).prop("hidden", false);
-        $(timeKey).prop("hidden", true);
-        textArea.focus();
-
-    });
-
-    $(rowArray).on('click', ".unlocked", function() {
-
-        if (lockToggle === true) return false;
-        
-        lockToggle = true;
-        let _this = this;
-
-        let rowID = $(_this).attr("id");
-
-        lockAllEntries();
-
-        let saveButton = $(_this).children(".unlocked").eq(0);
-        let timeKey = $(_this).children(".locked").eq(0);
-        let textArea = $(_this).children(".entry").eq(0);
-        $(textArea).prop("disabled", false);
-        $(saveButton).prop("hidden", false);
-        $(timeKey).prop("hidden", true);
-        textArea.focus();
-
-    });
+    setEventHandler(rowArray);
 
     $("#schedule").on('wheel', function(e) {
         // clearInterval(displayClock);
@@ -113,24 +72,24 @@ $(document).ready(function() {
 
     function scrollDown() {
         if (lockToggle === true) return false;
-
         position--; 
         $(rowArray[rowArray.length - 1]).remove();
         prependRow(position);
         rowArray = $(".row");
         rowChildren(rowArray[0]);
         formatRow(0, position);
+        setEventHandler(rowArray);
     }
 
     function scrollUp() {
         if (lockToggle === true) return false;
-
         position++; 
         $(rowArray[0]).remove();
         appendRow(position + rowArray.length - 1);
         rowArray = $(".row");
         rowChildren(rowArray[rowArray.length - 1]);
         formatRow(rowArray.length - 1, position);
+        setEventHandler(rowArray);
     }
 
     function appendRow(index) {
@@ -142,7 +101,6 @@ $(document).ready(function() {
         let rowTemp = '<div id="#entry_' + index + '" class="row"></div>' 
         $(scheduleStart).prepend(rowTemp);
     }
-
 
     function rowChildren(rowsToAppend) {
         let timeKeyTemp = '<div class="col-2 col-sm-1 locked rpmx"></div>'
@@ -158,6 +116,35 @@ $(document).ready(function() {
         $(".locked").prop("hidden", false);
         $(".unlocked").prop("hidden", true);
         $(".entry").prop("disabled", true);
+    }
+
+    function setEventHandler(rows) {
+
+        $(rows).on('click', function(event) {
+
+            if (!lockToggle && $(event.target).hasClass('entry')) {
+                lockToggle = true;
+                let _this = this;
+    
+                let rowID = $(_this).attr("id");
+    
+                lockAllEntries();
+    
+                let saveButton = $(_this).children(".unlocked").eq(0);
+                let timeKey = $(_this).children(".locked").eq(0);
+                let textArea = $(_this).children(".entry").eq(0);
+                $(textArea).prop("disabled", false);
+                $(saveButton).prop("hidden", false);
+                $(timeKey).prop("hidden", true);
+                textArea.focus();
+    
+                } else if (lockToggle && $(event.target).hasClass('unlocked')) {
+                    lockAllEntries();
+                    lockToggle = false;
+    
+                  } else { return false };
+        });
+        
     }
 
 });
