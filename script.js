@@ -47,13 +47,7 @@ $(document).ready(function() {
 
             // Home Button: Return to Current Time
             case event.keyCode === 36:
-                $(".row").remove();
-                rowArray = init();
-                timeHour = dt.local().set({hour: dt.local().hour, minute: "0", second: "0"});
-                for(let i = 0; i < rowArray.length; i++) {
-                    formatRow(i, 0);
-                }
-                setEventHandler(rowArray);
+                location.reload();
             break;
 
             // Page Up button: Scroll Up by a full page.
