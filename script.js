@@ -79,8 +79,6 @@ $(document).ready(function() {
         let displayClock = setInterval (function() {
             dtDisplay.text(dtInit);
             dtInit = dt.local().weekdayLong  + ", " + dt.local().plus({seconds: 1}).toLocaleString(dt.DATETIME_MED_WITH_SECONDS);
-            timeHour = dt.local().set({hour: dt.local().hour + 1, minute: "0", second: "0"});
-            if (dtInit == timeHour) scrollUp();
         }, 1000);
 
         return rowArray;
