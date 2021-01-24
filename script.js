@@ -63,9 +63,9 @@ $(document).ready(function() {
         return false;
       });
 
-    $("#schedule").on('swipe', function(event) {
+    $("#schedule").on('touchstart', function(event) {
 
-        let ydiff = event.swipestart.coords[1] - event.swipestop.coords[1];
+        let ydiff = event.touchstart.coords[1] - event.touchstop.coords[1];
         if (ydiff < 0) {
             scrollUp();
         } else {
