@@ -107,7 +107,7 @@ $(document).ready(function() {
         return rowArray;
     }
 
-    // Format the rows: Past/present/future. Load local data into rows as they are created.
+    // Format the rows: Past/present/future. Load local storage data into rows as they are created.
     function formatRow(i, j) {
 
         rowArray = $(".row");
