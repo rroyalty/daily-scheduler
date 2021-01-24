@@ -20,6 +20,34 @@ $(document).ready(function() {
 
     setEventHandler(rowArray);
 
+    $(document).on("keydown", function(event) {
+        console.log(event.keyCode);
+        switch(true) {
+            case event.keyCode === 40:
+                scrollUp();
+            break;
+            case event.keyCode === 38:
+                scrollDown();
+            break;
+            case event.keyCode === 36:
+                $(".row").remove();
+                rowArray = init();
+                timeHour = dt.local().set({hour: dt.local().hour, minute: "0", second: "0"});
+                for(let i = 0; i < rowArray.length; i++) {
+                    formatRow(i, 0);
+                }
+                setEventHandler(rowArray);
+            break;
+            case event.keyCode === 33:
+                for(i = 0; i < rowCount - 1; i++) scrollDown();
+            break;
+            case event.keyCode === 34:
+                for(i = 0; i < rowCount - 1; i++) scrollUp();
+            break;
+        }
+
+    });
+
     $("#schedule").on('wheel', function(e) {
         // clearInterval(displayClock);
         var delta = e.originalEvent.deltaY;
@@ -121,7 +149,6 @@ $(document).ready(function() {
     }
 
     function setEventHandler(rows) {
-
         $(rows).on('click', function(event) {
             let _this = this;
             let rowID = $(_this).attr("id");
