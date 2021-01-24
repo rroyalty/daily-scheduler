@@ -133,9 +133,9 @@ $(document).ready(function() {
     }
 
     function rowChildren(rowsToAppend) {
-        let timeKeyTemp = '<div class="d-inline-flex col-3 col-sm-1 locked rpmx"></div>'
-        let saveButton = '<div class="d-inline-flex d-none col-3 col-sm-1 btn btn-primary align-items-center justify-content-center unlocked rpmx">Save Entry</div>'
-        let entryField = '<textarea class="d-inline-flex col-9 col-sm-11 entry rpmx" rows="3" disabled></textarea>'
+        let timeKeyTemp = '<div class="d-inline-flex col-4 col-sm-1 locked rpmx"></div>'
+        let saveButton = '<div class="d-inline-flex d-none col-4 col-sm-1 btn btn-primary align-items-center justify-content-center unlocked rpmx">Save Entry</div>'
+        let entryField = '<textarea class="d-inline-flex col-8 col-sm-11 entry rpmx" rows="3" disabled></textarea>'
         let timeKeyPara = '<p class="d-inline-flex timeKey text-center align-items-center m-0"></p>'
         $(timeKeyTemp).appendTo(rowsToAppend).append(timeKeyPara);
         $(saveButton).appendTo(rowsToAppend);
