@@ -101,8 +101,8 @@ $(document).ready(function() {
         
         $(timeArray[i]).text(timeHour.plus({hours: i + j}).toLocaleString(dt.DATE_SHORT) +"\n" + timeHour.plus({hours: i + j}).toLocaleString(dt.TIME_SIMPLE));
 
-        let rowID = $(rowArray[i]).attr("id");
-        $(entryArray[i]).val(JSON.parse(localStorage.getItem(rowID)));
+        let storageID = $(timeArray[i]).text();
+        $(entryArray[i]).val(JSON.parse(localStorage.getItem(storageID)));
 
         if (timeHour.hour + i + j === dt.local().hour) $(rowArray[i]).addClass("present");
         else if (timeHour.hour + i + j > dt.local().hour) $(rowArray[i]).addClass("future");
@@ -160,9 +160,10 @@ $(document).ready(function() {
     function setEventHandler(rows) {
         $(rows).on('click', function(event) {
             let _this = this;
-            let rowID = $(_this).attr("id");
             let saveButton = $(_this).children(".unlocked").eq(0);
             let timeKey = $(_this).children(".locked").eq(0);
+            let storageID = $(timeKey).text();
+            console.log(storageID);
             let textArea = $(_this).children(".entry").eq(0);
 
             if ($(_this).hasClass('past') || $(_this).hasClass('present')) {
@@ -181,7 +182,7 @@ $(document).ready(function() {
         
                     } else if (lockToggle && $(event.target).hasClass('unlocked')) {
                         $(_this).addClass("future");
-                        localStorage.setItem(rowID, JSON.stringify($(textArea).val()));
+                        localStorage.setItem(storageID, JSON.stringify($(textArea).val()));
                         lockAllEntries();
                         lockToggle = false;
         
