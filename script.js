@@ -1,6 +1,5 @@
 $(document).ready(function() {
  
-    const schedEntries = { entries: [{}]};
     const dt = luxon.DateTime;
     const screenHeight = screen.availHeight;
     const rowCount = Math.floor((screenHeight - 166.7)/80)
@@ -65,13 +64,16 @@ $(document).ready(function() {
         
         $(timeArray[i]).text(timeHour.plus({hours: i + j}).toLocaleString(dt.DATE_SHORT) +"\n" + timeHour.plus({hours: i + j}).toLocaleString(dt.TIME_SIMPLE));
 
+        let rowID = $(rowArray[i]).attr("id");
+        $(entryArray[i]).val(JSON.parse(localStorage.getItem(rowID)));
+
         if (timeHour.hour + i + j === dt.local().hour) $(rowArray[i]).addClass("present");
         else if (timeHour.hour + i + j > dt.local().hour) $(rowArray[i]).addClass("future");
         else $(rowArray[i]).addClass("past");
     }
 
     function scrollDown() {
-        if (lockToggle === true) return false;
+        if (lockToggle) return false;
         position--; 
         $(rowArray[rowArray.length - 1]).remove();
         prependRow(position);
@@ -82,7 +84,7 @@ $(document).ready(function() {
     }
 
     function scrollUp() {
-        if (lockToggle === true) return false;
+        if (lockToggle) return false;
         position++; 
         $(rowArray[0]).remove();
         appendRow(position + rowArray.length - 1);
@@ -104,7 +106,7 @@ $(document).ready(function() {
 
     function rowChildren(rowsToAppend) {
         let timeKeyTemp = '<div class="col-2 col-sm-1 locked rpmx"></div>'
-        let saveButton = '<div class="col-2 col-sm-1 btn btn-primary unlocked rpmx" hidden="true"></div>'
+        let saveButton = '<div class="col-2 col-sm-1 btn btn-primary unlocked rpmx" hidden="true">Save Entry</div>'
         let entryField = '<textarea class="col-10 col-sm-11 entry rpmx" rows="3" disabled></textarea>'
         let timeKeyPara = '<p class="timeKey"></p>'
         $(timeKeyTemp).appendTo(rowsToAppend).append(timeKeyPara);
@@ -121,24 +123,28 @@ $(document).ready(function() {
     function setEventHandler(rows) {
 
         $(rows).on('click', function(event) {
+            let _this = this;
+            let rowID = $(_this).attr("id");
+            let saveButton = $(_this).children(".unlocked").eq(0);
+            let timeKey = $(_this).children(".locked").eq(0);
+            let textArea = $(_this).children(".entry").eq(0);
 
             if (!lockToggle && $(event.target).hasClass('entry')) {
                 lockToggle = true;
-                let _this = this;
-    
-                let rowID = $(_this).attr("id");
-    
+
                 lockAllEntries();
     
-                let saveButton = $(_this).children(".unlocked").eq(0);
-                let timeKey = $(_this).children(".locked").eq(0);
-                let textArea = $(_this).children(".entry").eq(0);
                 $(textArea).prop("disabled", false);
                 $(saveButton).prop("hidden", false);
                 $(timeKey).prop("hidden", true);
                 textArea.focus();
     
                 } else if (lockToggle && $(event.target).hasClass('unlocked')) {
+
+                    if ($(textArea).val() !== "") {
+                        localStorage.setItem(rowID, JSON.stringify($(textArea).val()));
+                    }
+
                     lockAllEntries();
                     lockToggle = false;
     
