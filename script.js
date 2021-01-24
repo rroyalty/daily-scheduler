@@ -47,7 +47,6 @@ $(document).ready(function() {
         }
 
     });
-    
 
     $("#schedule").on('wheel', function(e) {
         // clearInterval(displayClock);
@@ -63,18 +62,13 @@ $(document).ready(function() {
         return false;
       });
 
-    $("#schedule").on('touchstart', function(event) {
+    $("#schedule").on('swipe', function(event) {
 
-        let ydiff = event.touchstart.coords[1] - event.touchstop.coords[1];
-        if (ydiff < 0) {
+        if (event.deltaY < 0) {
             scrollUp();
         } else {
-            scrollDown();; 
+            scrollDown();
             }
-
-
-        alert("test!");
-        console.log(event);
     });
 
     function init() {
