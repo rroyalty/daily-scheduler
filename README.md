@@ -32,8 +32,8 @@ Below are the links associated with this project.
 
 ## Screenshots of Project
 
-![Opening Page:](https://github.com/rroyalty/code-quiz/blob/main/assets/images/codeQuizOpeningScreen.jpg)
-![Quiz Questions Page:](https://github.com/rroyalty/code-quiz/blob/main/assets/images/codeQuizQuestionsScreen.jpg)  
+![On Open:](https://github.com/rroyalty/daily-scheduler/blob/main/Example/workSchedulerLocked.bmp)
+![Example Entries:](https://github.com/rroyalty/daily-scheduler/blob/main/Example/workSchedulerWithEntries.bmp)  
 
 ## Credits
 
