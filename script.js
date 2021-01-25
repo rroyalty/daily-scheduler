@@ -2,47 +2,31 @@ $(document).ready(function() {
  
     // Initial Variables
     const dt = luxon.DateTime;
+    let lockToggle = false;
+    let position = 0;
+    let scheduleStart = $("#schedule");
+
     // Available screen height.
     const screenHeight = screen.availHeight;
+
     // Only few enough rows that the current screen can display are created based off of element sizes and available screen height.
     const rowCount = Math.floor((screenHeight - 166.7)/80)
 
-    let lockToggle = false;
-    let scheduleStart = $("#schedule");
+    // Initialize Row Collection and Start Clock.
+    let rowArray = init();
 
-    let rowArray = $(".row");
+    // Other Collections.
     let entryArray = $(".entry");
     let timeArray = $(".timeKey");
     let buttonArray = $(".unlocked");
+    
+    // Current Time to the Hour.
+    let timeHour = dt.local().set({hour: dt.local().hour, minute: "0", second: "0"});
 
-    // Current Time to the Hour
-    let rfHour = dt.local().set({hour: dt.local().hour, minute: "0", second: "0"});
-    let rlHour = dt.local().set({hour: dt.local().hour, minute: "0", second: "0"});
-    let nowHour = dt.local().set({hour: dt.local().hour, minute: "0", second: "0"});
-
-    // Current Time and Day, Human Readable.
-    let dtInit = dt.local().weekdayLong + ", " + dt.local().toLocaleString(dt.DATETIME_MED_WITH_SECONDS);
-
-    // UI Time/Day Display Element
-    let dtDisplay = $("#currentDay");
-
-    // Create clock.
-    let displayClock = setInterval (function() {
-        dtDisplay.text(dtInit);
-        dtInit = dt.local().weekdayLong  + ", " + dt.local().plus({seconds: 1}).toLocaleString(dt.DATETIME_MED_WITH_SECONDS);
-    }, 1000);
-
-    // Create initial Rows.
-    for(let i = 0; i < rowCount - 1; i++) {
-        appendRow(i);
-        rfHour = nowHour;
-        rowArray = $('.row');
-        rowChildren(rowArray[i]);
-        formatRow(i, 1);
+    // Format freshley created rows elements.
+    for(let i = 0; i < rowArray.length; i++) {
+        formatRow(i, 0);
     }
-
-    // Set Timestamp of Last Row.
-    rlhour = rlHour.plus({hours: rowArray.length - 1});
 
     // Set the Event Handlers for the initial set of rows.
     setEventHandler(rowArray);
@@ -96,6 +80,33 @@ $(document).ready(function() {
         return false;
       });
 
+
+    // Initialize Function: Start clock and create initial set of rows.
+    function init() {
+        let dtInit = dt.local().weekdayLong + ", " + dt.local().toLocaleString(dt.DATETIME_MED_WITH_SECONDS);
+        let dtDisplay = $("#currentDay");
+
+        // Create rows.
+        for(let i = 0; i < rowCount - 1; i++) {
+            appendRow(i);
+        }
+
+        let rowArray = $(".row");
+
+        // Create Row children objects.
+        rowChildren(rowArray);
+
+        dtDisplay.text(dtInit);
+
+        // Create clock.
+        let displayClock = setInterval (function() {
+            dtDisplay.text(dtInit);
+            dtInit = dt.local().weekdayLong  + ", " + dt.local().plus({seconds: 1}).toLocaleString(dt.DATETIME_MED_WITH_SECONDS);
+        }, 1000);
+
+        return rowArray;
+    }
+
     // Format the rows: Past/present/future. Load local storage data into rows as they are created.
     function formatRow(i, j) {
 
@@ -103,65 +114,49 @@ $(document).ready(function() {
         entryArray = $(".entry");
         timeArray = $(".timeKey");
         
-        if (j===1) $(timeArray[i]).text(rlHour.toLocaleString(dt.DATE_SHORT) +"\n" + rlHour.toLocaleString(dt.TIME_SIMPLE));
-        else if (j===-1) $(timeArray[i]).text(rfHour.toLocaleString(dt.DATE_SHORT) +"\n" + rfHour.toLocaleString(dt.TIME_SIMPLE));
-        else alert("error formatting rows.");
+        $(timeArray[i]).text(timeHour.plus({hours: i + j}).toLocaleString(dt.DATE_SHORT) +"\n" + timeHour.plus({hours: i + j}).toLocaleString(dt.TIME_SIMPLE));
 
         let storageID = $(timeArray[i]).text();
         $(entryArray[i]).val(JSON.parse(localStorage.getItem(storageID)));
 
-        if (String(rfHour.ts).slice(0, -3) === String(nowHour.ts).slice(0, -3)) $(rowArray[i]).addClass("present");
-        else if (rfHour.ts > nowHour.ts) $(rowArray[i]).addClass("future");
+        if (timeHour.hour + i + j === dt.local().hour) $(rowArray[i]).addClass("present");
+        else if (timeHour.hour + i + j > dt.local().hour) $(rowArray[i]).addClass("future");
         else $(rowArray[i]).addClass("past");
-
-        if (rfHour.hour === 17) $(rowArray[i]).addClass("bottomBorder");
     }
 
     // Scroll Down towards future events.
     function scrollDown() {
         if (lockToggle) return false;
+        position--; 
         $(rowArray[rowArray.length - 1]).remove();
-        prependRow();
+        prependRow(position);
         rowArray = $(".row");
         rowChildren(rowArray[0]);
-        formatRow(0, -1);
+        formatRow(0, position);
         setEventHandler(rowArray);
     }
 
     // Scroll up towards past events.
     function scrollUp() {
         if (lockToggle) return false;
+        position++; 
         $(rowArray[0]).remove();
-        appendRow();
+        appendRow(position + rowArray.length - 1);
         rowArray = $(".row");
         rowChildren(rowArray[rowArray.length - 1]);
-        formatRow(rowArray.length - 1, 1);
+        formatRow(rowArray.length - 1, position);
         setEventHandler(rowArray);
     }
 
     // Append a 'future' row.
-    function appendRow() {
-        if (rlHour.hour === 17) {
-            rfhour = rfHour.plus({hours: 16});
-            rlhour = rlHour.plus({hours: 16});
-        } else {
-            rfhour = rfHour.plus({hours: 1});
-            rlhour = rlHour.plus({hours: 1});
-        }
-        let rowTemp = '<div class="row"></div>'
+    function appendRow(index) {
+        let rowTemp = '<div id="#entry_' + index + '" class="row"></div>' 
         $(scheduleStart).append(rowTemp);
     }
 
     // Prepend a 'past' row.
-    function prependRow() {
-        if (rfHour.hour === 9) {
-            rfhour = rfHour.minus({hours: 16});
-            rlhour = rlHour.minus({hours: 16});
-        } else {
-            rfhour = rfHour.minus({hours: 1});
-            rlhour = rlHour.minus({hours: 1});
-        }
-        let rowTemp = '<div class="row"></div>'
+    function prependRow(index) {
+        let rowTemp = '<div id="#entry_' + index + '" class="row"></div>' 
         $(scheduleStart).prepend(rowTemp);
     }
 
@@ -192,6 +187,7 @@ $(document).ready(function() {
             let saveButton = $(_this).children(".unlocked").eq(0);
             let timeKey = $(_this).children(".locked").eq(0);
             let storageID = $(timeKey).text();
+            console.log(storageID);
             let textArea = $(_this).children(".entry").eq(0);
 
             // Only future rows may be editted.
