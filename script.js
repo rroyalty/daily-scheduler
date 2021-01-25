@@ -2,30 +2,42 @@ $(document).ready(function() {
  
     // Initial Variables
     const dt = luxon.DateTime;
-    let lockToggle = false;
-    let position = 0;
-    let scheduleStart = $("#schedule");
-
     // Available screen height.
     const screenHeight = screen.availHeight;
-
     // Only few enough rows that the current screen can display are created based off of element sizes and available screen height.
     const rowCount = Math.floor((screenHeight - 166.7)/80)
 
-    // Initialize Row Collection and Start Clock.
-    let rowArray = init();
+    let lockToggle = false;
+    let scheduleStart = $("#schedule");
 
-    // Other Collections.
+    let rowArray = $(".row");
     let entryArray = $(".entry");
     let timeArray = $(".timeKey");
     let buttonArray = $(".unlocked");
-    
-    // Current Time to the Hour.
-    let timeHour = dt.local().set({hour: dt.local().hour, minute: "0", second: "0"});
 
-    // Format freshley created rows elements.
-    for(let i = 0; i < rowArray.length; i++) {
-        formatRow(i, 0);
+    // Current Time to the Hour.
+
+    let timeHour = dt.local().set({hour: dt.local().hour, minute: "0", second: "0"});
+    let nowHour = dt.local().set({hour: dt.local().hour, minute: "0", second: "0"});
+
+    // Current Time and Day, Human Readable.
+    let dtInit = dt.local().weekdayLong + ", " + dt.local().toLocaleString(dt.DATETIME_MED_WITH_SECONDS);
+
+    // UI Time/Day Display Element
+    let dtDisplay = $("#currentDay");
+
+    // Create clock.
+    let displayClock = setInterval (function() {
+        dtDisplay.text(dtInit);
+        dtInit = dt.local().weekdayLong  + ", " + dt.local().plus({seconds: 1}).toLocaleString(dt.DATETIME_MED_WITH_SECONDS);
+    }, 1000);
+
+    // Create initial Rows.
+    for(let i = 0; i < rowCount - 1; i++) {
+        appendRow(i);
+        rowArray = $('.row');
+        rowChildren(rowArray[i]);
+        formatRow(i, -1);
     }
 
     // Set the Event Handlers for the initial set of rows.
@@ -83,26 +95,7 @@ $(document).ready(function() {
 
     // Initialize Function: Start clock and create initial set of rows.
     function init() {
-        let dtInit = dt.local().weekdayLong + ", " + dt.local().toLocaleString(dt.DATETIME_MED_WITH_SECONDS);
-        let dtDisplay = $("#currentDay");
-
-        // Create rows.
-        for(let i = 0; i < rowCount - 1; i++) {
-            appendRow(i);
-        }
-
-        let rowArray = $(".row");
-
-        // Create Row children objects.
-        rowChildren(rowArray);
-
-        dtDisplay.text(dtInit);
-
-        // Create clock.
-        let displayClock = setInterval (function() {
-            dtDisplay.text(dtInit);
-            dtInit = dt.local().weekdayLong  + ", " + dt.local().plus({seconds: 1}).toLocaleString(dt.DATETIME_MED_WITH_SECONDS);
-        }, 1000);
+        
 
         return rowArray;
     }
@@ -113,51 +106,66 @@ $(document).ready(function() {
         rowArray = $(".row");
         entryArray = $(".entry");
         timeArray = $(".timeKey");
+        console.log(timeHour);
         
-        $(timeArray[i]).text(timeHour.plus({hours: i + j}).toLocaleString(dt.DATE_SHORT) +"\n" + timeHour.plus({hours: i + j}).toLocaleString(dt.TIME_SIMPLE));
+        $(timeArray[i]).text(timeHour.plus({hours: j}).toLocaleString(dt.DATE_SHORT) +"\n" + timeHour.plus({hours: j}).toLocaleString(dt.TIME_SIMPLE));
 
+        console.log(timeHour);
         let storageID = $(timeArray[i]).text();
         $(entryArray[i]).val(JSON.parse(localStorage.getItem(storageID)));
 
-        if (timeHour.hour + i + j === dt.local().hour) $(rowArray[i]).addClass("present");
-        else if (timeHour.hour + i + j > dt.local().hour) $(rowArray[i]).addClass("future");
+        console.log(String(nowHour.ts).slice(0, -3));
+        console.log(String((timeHour.plus({hours: j}).ts)).slice(0, -3));
+
+        if (String(timeHour.plus({hours: j}).ts).slice(0, -3) === String(nowHour.ts).slice(0, -3)) $(rowArray[i]).addClass("present");
+        else if (String(timeHour.plus({hours: j}).ts).slice(0, -3) > String(nowHour.ts).slice(0, -3)) $(rowArray[i]).addClass("future");
         else $(rowArray[i]).addClass("past");
     }
 
     // Scroll Down towards future events.
     function scrollDown() {
         if (lockToggle) return false;
-        position--; 
         $(rowArray[rowArray.length - 1]).remove();
-        prependRow(position);
+        prependRow();
         rowArray = $(".row");
         rowChildren(rowArray[0]);
-        formatRow(0, position);
+        formatRow(0, -rowArray.length + 1);
         setEventHandler(rowArray);
     }
 
     // Scroll up towards past events.
     function scrollUp() {
         if (lockToggle) return false;
-        position++; 
         $(rowArray[0]).remove();
-        appendRow(position + rowArray.length - 1);
+        appendRow();
         rowArray = $(".row");
         rowChildren(rowArray[rowArray.length - 1]);
-        formatRow(rowArray.length - 1, position);
+        formatRow(rowArray.length - 1, -1);
         setEventHandler(rowArray);
     }
 
     // Append a 'future' row.
-    function appendRow(index) {
-        let rowTemp = '<div id="#entry_' + index + '" class="row"></div>' 
-        $(scheduleStart).append(rowTemp);
+    function appendRow() {
+        if( timeHour.hour > 17 || timeHour.hour < 9) {
+            timeHour = timeHour.plus({hours: 1});
+            appendRow();
+        } else {
+            let rowTemp = '<div class="row"></div>'
+            $(scheduleStart).append(rowTemp);
+            timeHour = timeHour.plus({hours: 1});
+        }
     }
 
     // Prepend a 'past' row.
-    function prependRow(index) {
-        let rowTemp = '<div id="#entry_' + index + '" class="row"></div>' 
-        $(scheduleStart).prepend(rowTemp);
+    function prependRow() {
+        if( timeHour.hour > 17 || timeHour.hour < 9) {
+            timeHour = timeHour.plus({hours: -1});
+            prependRow();
+        } else {
+            let rowTemp = '<div class="row"></div>'
+            $(scheduleStart).prepend(rowTemp);
+            timeHour = timeHour.plus({hours: -1});
+        }
     }
 
     // Append all child objects necessary to rows.
@@ -187,7 +195,6 @@ $(document).ready(function() {
             let saveButton = $(_this).children(".unlocked").eq(0);
             let timeKey = $(_this).children(".locked").eq(0);
             let storageID = $(timeKey).text();
-            console.log(storageID);
             let textArea = $(_this).children(".entry").eq(0);
 
             // Only future rows may be editted.
