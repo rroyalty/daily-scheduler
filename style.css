@@ -67,3 +67,7 @@ div.row {
 .finalBorder {
   border-bottom: 10px solid black;
 }
+
+.bottomBorder {
+  border-bottom: 2px solid black;
+}

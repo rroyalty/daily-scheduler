@@ -15,9 +15,9 @@ $(document).ready(function() {
     let timeArray = $(".timeKey");
     let buttonArray = $(".unlocked");
 
-    // Current Time to the Hour.
-
-    let timeHour = dt.local().set({hour: dt.local().hour, minute: "0", second: "0"});
+    // Current Time to the Hour
+    let rfHour = dt.local().set({hour: dt.local().hour, minute: "0", second: "0"});
+    let rlHour = dt.local().set({hour: dt.local().hour, minute: "0", second: "0"});
     let nowHour = dt.local().set({hour: dt.local().hour, minute: "0", second: "0"});
 
     // Current Time and Day, Human Readable.
@@ -35,10 +35,14 @@ $(document).ready(function() {
     // Create initial Rows.
     for(let i = 0; i < rowCount - 1; i++) {
         appendRow(i);
+        rfHour = nowHour;
         rowArray = $('.row');
         rowChildren(rowArray[i]);
-        formatRow(i, -1);
+        formatRow(i, 1);
     }
+
+    // Set Timestamp of Last Row.
+    rlhour = rlHour.plus({hours: rowArray.length - 1});
 
     // Set the Event Handlers for the initial set of rows.
     setEventHandler(rowArray);
@@ -92,34 +96,25 @@ $(document).ready(function() {
         return false;
       });
 
-
-    // Initialize Function: Start clock and create initial set of rows.
-    function init() {
-        
-
-        return rowArray;
-    }
-
     // Format the rows: Past/present/future. Load local storage data into rows as they are created.
     function formatRow(i, j) {
 
         rowArray = $(".row");
         entryArray = $(".entry");
         timeArray = $(".timeKey");
-        console.log(timeHour);
         
-        $(timeArray[i]).text(timeHour.plus({hours: j}).toLocaleString(dt.DATE_SHORT) +"\n" + timeHour.plus({hours: j}).toLocaleString(dt.TIME_SIMPLE));
+        if (j===1) $(timeArray[i]).text(rlHour.toLocaleString(dt.DATE_SHORT) +"\n" + rlHour.toLocaleString(dt.TIME_SIMPLE));
+        else if (j===-1) $(timeArray[i]).text(rfHour.toLocaleString(dt.DATE_SHORT) +"\n" + rfHour.toLocaleString(dt.TIME_SIMPLE));
+        else alert("error formatting rows.");
 
-        console.log(timeHour);
         let storageID = $(timeArray[i]).text();
         $(entryArray[i]).val(JSON.parse(localStorage.getItem(storageID)));
 
-        console.log(String(nowHour.ts).slice(0, -3));
-        console.log(String((timeHour.plus({hours: j}).ts)).slice(0, -3));
-
-        if (String(timeHour.plus({hours: j}).ts).slice(0, -3) === String(nowHour.ts).slice(0, -3)) $(rowArray[i]).addClass("present");
-        else if (String(timeHour.plus({hours: j}).ts).slice(0, -3) > String(nowHour.ts).slice(0, -3)) $(rowArray[i]).addClass("future");
+        if (String(rfHour.ts).slice(0, -3) === String(nowHour.ts).slice(0, -3)) $(rowArray[i]).addClass("present");
+        else if (rfHour.ts > nowHour.ts) $(rowArray[i]).addClass("future");
         else $(rowArray[i]).addClass("past");
+
+        if (rfHour.hour === 17) $(rowArray[i]).addClass("bottomBorder");
     }
 
     // Scroll Down towards future events.
@@ -129,7 +124,7 @@ $(document).ready(function() {
         prependRow();
         rowArray = $(".row");
         rowChildren(rowArray[0]);
-        formatRow(0, -rowArray.length + 1);
+        formatRow(0, -1);
         setEventHandler(rowArray);
     }
 
@@ -140,32 +135,34 @@ $(document).ready(function() {
         appendRow();
         rowArray = $(".row");
         rowChildren(rowArray[rowArray.length - 1]);
-        formatRow(rowArray.length - 1, -1);
+        formatRow(rowArray.length - 1, 1);
         setEventHandler(rowArray);
     }
 
     // Append a 'future' row.
     function appendRow() {
-        if( timeHour.hour > 17 || timeHour.hour < 9) {
-            timeHour = timeHour.plus({hours: 1});
-            appendRow();
+        if (rlHour.hour === 17) {
+            rfhour = rfHour.plus({hours: 16});
+            rlhour = rlHour.plus({hours: 16});
         } else {
-            let rowTemp = '<div class="row"></div>'
-            $(scheduleStart).append(rowTemp);
-            timeHour = timeHour.plus({hours: 1});
+            rfhour = rfHour.plus({hours: 1});
+            rlhour = rlHour.plus({hours: 1});
         }
+        let rowTemp = '<div class="row"></div>'
+        $(scheduleStart).append(rowTemp);
     }
 
     // Prepend a 'past' row.
     function prependRow() {
-        if( timeHour.hour > 17 || timeHour.hour < 9) {
-            timeHour = timeHour.plus({hours: -1});
-            prependRow();
+        if (rfHour.hour === 9) {
+            rfhour = rfHour.minus({hours: 16});
+            rlhour = rlHour.minus({hours: 16});
         } else {
-            let rowTemp = '<div class="row"></div>'
-            $(scheduleStart).prepend(rowTemp);
-            timeHour = timeHour.plus({hours: -1});
+            rfhour = rfHour.minus({hours: 1});
+            rlhour = rlHour.minus({hours: 1});
         }
+        let rowTemp = '<div class="row"></div>'
+        $(scheduleStart).prepend(rowTemp);
     }
 
     // Append all child objects necessary to rows.
