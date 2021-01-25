@@ -13,9 +13,15 @@ I had a hard time with this homework. I got to what I thought was a good finishe
 The project is a website; no installation necessary.
 
 ## Controls
+
 Up/Down/Mousewheel - Scroll one entry at a time.
 PgUp/PgDn - Scroll an entire page entries.
 Home - Return to current time.
+
+Click on Row - Open entry to modification and reveal commit button. Navigation controls disabled while editing an entry.
+Click on 'Save Entry' - Commit the entry to storage and enable navigation.
+
+Only 'Future' entries are modifiable.
 
 ## Usage 
 
@@ -37,6 +43,7 @@ StackOverflow.com
 w3schools.com
 bootstrap
 JQuery
+Luxon
 
 ## Badges
 
